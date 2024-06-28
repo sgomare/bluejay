@@ -1209,7 +1209,9 @@ extension Bluejay: CBCentralManagerDelegate {
         debugLog("Central manager did connect to: \(peripheral.name ?? peripheral.identifier.uuidString)")
 
         connectingCallback = nil
+        let wasConnected = isConnected
 
+        debugLog("Central manager connected to perihperal already: \(wasConnected)")
         connectedPeripheral = connectingPeripheral ?? connectedPeripheral
         connectingPeripheral = nil
 
@@ -1221,7 +1223,9 @@ extension Bluejay: CBCentralManagerDelegate {
         if queue.first is Connection {
             queue.process(event: .didConnectPeripheral(connectedPeripheral!), error: nil)
         }
-
+       guard !wasConnected else {
+            return
+        }
         for observer in connectionObservers {
             observer.weakReference?.connected(to: connectedPeripheral!.identifier)
         }
