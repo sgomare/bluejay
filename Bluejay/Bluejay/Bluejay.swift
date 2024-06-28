@@ -1210,7 +1210,7 @@ extension Bluejay: CBCentralManagerDelegate {
 
         connectingCallback = nil
 
-        connectedPeripheral = connectingPeripheral
+        connectedPeripheral = connectingPeripheral ?? connectedPeripheral
         connectingPeripheral = nil
 
         precondition(connectedPeripheral != nil, "Connected peripheral is assigned a nil value despite Bluejay has successfully finished a connection.")
@@ -1218,7 +1218,9 @@ extension Bluejay: CBCentralManagerDelegate {
         shouldAutoReconnect = true
         debugLog("Should auto-reconnect: \(shouldAutoReconnect)")
 
-        queue.process(event: .didConnectPeripheral(connectedPeripheral!), error: nil)
+        if queue.first is Connection {
+            queue.process(event: .didConnectPeripheral(connectedPeripheral!), error: nil)
+        }
 
         for observer in connectionObservers {
             observer.weakReference?.connected(to: connectedPeripheral!.identifier)
